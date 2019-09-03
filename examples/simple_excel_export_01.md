@@ -2,7 +2,7 @@
 
 ```javascript
 import React from "react";
-import ReactExport from "react-data-export";
+import ReactExport from "react-export-excel";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -70,5 +70,5 @@ class Download extends React.Component {
 }
 ```
 
-## Output 
+## Output
 ![Simple Excel Export](https://i.imgur.com/6fwdJeo.png)
