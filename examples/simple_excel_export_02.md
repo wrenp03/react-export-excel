@@ -1,6 +1,6 @@
 ```javascript
 import React from "react";
-import {ExcelFile, ExcelSheet} from "react-data-export";
+import {ExcelFile, ExcelSheet} from "react-export-excel";
 
 const multiDataSet = [
     {
@@ -40,4 +40,3 @@ class Download extends React.Component {
 
 ## Output
 ![Simple Excel Export with dataset](http://i67.tinypic.com/2jcybeu.jpg)
-
