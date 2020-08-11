@@ -5,7 +5,7 @@ const strToArrBuffer = (s) => {
     var view = new Uint8Array(buf);
 
     for (var i = 0; i != s.length; ++i) {
-        view[i] = s.charCodeAt(i) & 0xFF;
+        view[i] = s.charCodeAt(i) & 0xff;
     }
 
     return buf;
@@ -37,13 +37,15 @@ const excelSheetFromDataSet = (dataSet) => {
     }
 
     var ws = {};
-    var range = {s: {c: 10000000, r: 10000000}, e: {c: 0, r: 0}};
+    var range = { s: { c: 10000000, r: 10000000 }, e: { c: 0, r: 0 } };
     var rowCount = 0;
 
-    dataSet.forEach(dataSetItem => {
+    dataSet.forEach((dataSetItem) => {
         var columns = dataSetItem.columns;
-        var xSteps = typeof(dataSetItem.xSteps) === 'number' ? dataSetItem.xSteps : 0;
-        var ySteps = typeof(dataSetItem.ySteps) === 'number' ? dataSetItem.ySteps : 0;
+        var xSteps =
+      typeof dataSetItem.xSteps === "number" ? dataSetItem.xSteps : 0;
+        var ySteps =
+      typeof dataSetItem.ySteps === "number" ? dataSetItem.ySteps : 0;
         var data = dataSetItem.data;
         if (dataSet === undefined || dataSet.length === 0) {
             return;
@@ -53,9 +55,12 @@ const excelSheetFromDataSet = (dataSet) => {
 
         if (columns.length >= 0) {
             columns.forEach((col, index) => {
-                var cellRef = XLSX.utils.encode_cell({c: xSteps + index, r: rowCount});
+                var cellRef = XLSX.utils.encode_cell({
+                    c: xSteps + index,
+                    r: rowCount,
+                });
                 fixRange(range, 0, 0, rowCount, xSteps, ySteps);
-                getHeaderCell(col, cellRef, ws);
+                getCell(col, cellRef, ws);
             });
 
             rowCount += 1;
@@ -63,7 +68,7 @@ const excelSheetFromDataSet = (dataSet) => {
 
         for (var R = 0; R != data.length; ++R, rowCount++) {
             for (var C = 0; C != data[R].length; ++C) {
-                var cellRef = XLSX.utils.encode_cell({c: C + xSteps, r: rowCount});
+                var cellRef = XLSX.utils.encode_cell({ c: C + xSteps, r: rowCount });
                 fixRange(range, R, C, rowCount, xSteps, ySteps);
                 getCell(data[R][C], cellRef, ws);
             }
@@ -71,19 +76,57 @@ const excelSheetFromDataSet = (dataSet) => {
     });
 
     if (range.s.c < 10000000) {
-        ws['!ref'] = XLSX.utils.encode_range(range);
+        ws["!ref"] = XLSX.utils.encode_range(range);
     }
+
+    // set column width
+    ws["!cols"] = setColumnWidth(dataSet);
 
     return ws;
 };
 
-function getHeaderCell(v, cellRef, ws) {
-    var cell = {};
-    var headerCellStyle = {font: {bold: true}};
-    cell.v = v;
-    cell.t = 's';
-    cell.s = headerCellStyle;
-    ws[cellRef] = cell;
+/**
+ * set column width
+ */
+function setColumnWidth (dataSet) {
+    let columnWidths = [];
+
+    // set colum width
+    if (dataSet) {
+        for (var i=0; i<dataSet.length; i++) {
+
+            const data = dataSet[i];
+            const columns = data.columns;
+            
+            if (columns) {
+                for (var j=0; j<columns.length; j++) {
+            
+                    const column = columns[j];
+
+                    if (column.widthPx) {
+                        columnWidths.push({
+                            wpx: column.widthPx,
+                        });
+                        continue;
+                    }
+
+                    if (column.widthCh) {
+                        columnWidths.push({
+                            wpx: column.widthCh,
+                        });
+                        continue;
+                    }
+                    
+                    columnWidths.push({
+                        wpx: 64, // 64px is default column width in excel
+                    });
+                }
+            }
+
+        }
+    }
+
+    return columnWidths;
 }
 
 function getCell(v, cellRef, ws) {
@@ -91,22 +134,22 @@ function getCell(v, cellRef, ws) {
     if (v === null) {
         return;
     }
-    if (typeof v === 'number') {
+    if (typeof v === "number") {
         cell.v = v;
-        cell.t = 'n';
-    } else if (typeof v === 'boolean') {
+        cell.t = "n";
+    } else if (typeof v === "boolean") {
         cell.v = v;
-        cell.t = 'b';
+        cell.t = "b";
     } else if (v instanceof Date) {
-        cell.t = 'n';
+        cell.t = "n";
         cell.z = XLSX.SSF._table[14];
         cell.v = dateToNumber(cell.v);
-    } else if (typeof v === 'object') {
+    } else if (typeof v === "object") {
         cell.v = v.value;
         cell.s = v.style;
     } else {
         cell.v = v;
-        cell.t = 's';
+        cell.t = "s";
     }
     ws[cellRef] = cell;
 }
@@ -131,7 +174,7 @@ function fixRange(range, R, C, rowCount, xSteps, ySteps) {
 
 const excelSheetFromAoA = (data) => {
     var ws = {};
-    var range = {s: {c: 10000000, r: 10000000}, e: {c: 0, r: 0}};
+    var range = { s: { c: 10000000, r: 10000000 }, e: { c: 0, r: 0 } };
 
     for (var R = 0; R != data.length; ++R) {
         for (var C = 0; C != data[R].length; ++C) {
@@ -151,22 +194,22 @@ const excelSheetFromAoA = (data) => {
                 range.e.c = C;
             }
 
-            var cell = {v: data[R][C]};
+            var cell = { v: data[R][C] };
             if (cell.v === null) {
                 continue;
             }
 
-            var cellRef = XLSX.utils.encode_cell({c: C, r: R});
-            if (typeof cell.v === 'number') {
-                cell.t = 'n';
-            } else if (typeof cell.v === 'boolean') {
-                cell.t = 'b';
+            var cellRef = XLSX.utils.encode_cell({ c: C, r: R });
+            if (typeof cell.v === "number") {
+                cell.t = "n";
+            } else if (typeof cell.v === "boolean") {
+                cell.t = "b";
             } else if (cell.v instanceof Date) {
-                cell.t = 'n';
+                cell.t = "n";
                 cell.z = XLSX.SSF._table[14];
                 cell.v = dateToNumber(cell.v);
             } else {
-                cell.t = 's';
+                cell.t = "s";
             }
 
             ws[cellRef] = cell;
@@ -174,11 +217,15 @@ const excelSheetFromAoA = (data) => {
     }
 
     if (range.s.c < 10000000) {
-        ws['!ref'] = XLSX.utils.encode_range(range);
+        ws["!ref"] = XLSX.utils.encode_range(range);
     }
 
     return ws;
 };
 
-
-export {strToArrBuffer, dateToNumber, excelSheetFromAoA, excelSheetFromDataSet};
+export {
+    strToArrBuffer,
+    dateToNumber,
+    excelSheetFromAoA,
+    excelSheetFromDataSet,
+};
