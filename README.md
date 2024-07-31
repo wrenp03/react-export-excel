@@ -1,3 +1,8 @@
+ [!NOTE]  
+> This repository is a fork of the library listed below.
+> The main purpose of this fork is to update the dependency for Sheet.js to point to the new Sheet.js repository.
+> The readme below comes from the original react-data-export repository.
+
 # React-Export-Excel
 
 [![npm version](https://badge.fury.io/js/react-data-export.svg)](https://badge.fury.io/js/react-data-export)
