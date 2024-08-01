@@ -2,7 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\test",
-    "\\test\\unit"
+    "\\test\\unit",
+    "\\test\\unit\\__snapshots__"
   ],
+  "SelectedNode": "\\package.json",
   "PreviewInSolutionExplorer": false
 }
